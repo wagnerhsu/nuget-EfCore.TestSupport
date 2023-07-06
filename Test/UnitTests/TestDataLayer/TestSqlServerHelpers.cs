@@ -107,6 +107,7 @@ namespace Test.UnitTests.TestDataLayer
 
                 //VERIFY
                 context.Books.Count().ShouldEqual(0);
+
             }
         }
 
@@ -153,6 +154,28 @@ namespace Test.UnitTests.TestDataLayer
                 context.Entry(book).State.ShouldEqual(EntityState.Detached);
 
             }
+        }
+
+        [Fact]
+        public void TestQueryData()
+        {
+            //SETUP
+            var options = this.CreateUniqueMethodOptions<BookContext>();
+            using (var context = new BookContext(options))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+                context.SeedDatabaseFourBooks();
+            }
+
+            using (var context = new BookContext(options))
+            {
+                var book = context.Books.FirstOrDefault(x => x.Title == "Refactoring");
+                book.ShouldNotBeNull();
+                book = context.Books.FirstOrDefault(x => x.Title == "FakeTitle");
+                book.ShouldBeNull();
+            }
+
         }
     }
 }
